@@ -22,6 +22,7 @@
     "express": "^4.11.2",
     "express-session": "^1.10.2",
     "passport": "^0.2.1",
-    "passport-github": "^0.1.5"
+    "passport-github": "^0.1.5",
+    "request": "^2.53.0"
   }
 }

@@ -1,8 +1,12 @@
 var app = angular.module('coderFriends');
 
-app.controller('MainCtrlr', function($http, $q) {
+app.controller('MainCtrlr', function($scope, GithubService, $location, $window) {
+
+	$scope.test = "WORK"
 
 	$scope.github = function() {
-		redirectTo: '/auth/github'
+		$window.location.href = '/auth/github';
 	};
+
+	
 });

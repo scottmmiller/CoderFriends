@@ -3,6 +3,7 @@ var session = require('express-session');
 var passport = require('passport');
 var bodyParser = require('body-parser');
 var GitHubStrategy = require('passport-github').Strategy;
+var request = require('request')
 var port = 9999;
 
 var app = express();
@@ -10,7 +11,7 @@ var app = express();
 //isAuthed Function
 var isAuthed = function(req, res, next) {
 	if(!req.isAuthenticated()) {
-		return res.redirect('/')
+		return res.status(418).end();
 	}
 	next();
 };
@@ -24,6 +25,14 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+//Serializations
+passport.serializeUser(function(user, done) {
+	done(null, user)	
+});
+passport.deserializeUser(function(object, done) {
+	done(null, object);
+});
+
 //GitHub Strategy
 passport.use(new GitHubStrategy({
 	clientID: 'f8b97735cf595228815a',
@@ -32,6 +41,7 @@ passport.use(new GitHubStrategy({
 	},
 	function(accessToken, refreshToken, profile, done) {
 		//create, update database info
+		console.log('auth')
 		return done(null, profile);
 	}
 ));
@@ -40,9 +50,28 @@ passport.use(new GitHubStrategy({
 app.get('/auth/github', passport.authenticate('github'));
 
 app.get('/auth/github/callback', passport.authenticate('github', {
-	successRedirect: '/home.html',
+	successRedirect: '/api/github/following',
 	failureRedirect: '/'
 }));
+
+//GitHub Following
+app.get('/api/github/following', isAuthed, function(req, res) {
+	request.get({
+		url: 'https://api.github.com/user/followers',
+		headers: {
+			'User-Agent': 'CoderFriends99'
+		}
+	}, function(err, response){
+		if(!err){
+			res.status(200).json(response); 
+		} else {
+			res.status(418).json(err);
+		}
+	});
+});
+
+
+//
 
 
 
